@@ -17,7 +17,7 @@ class DashboardController extends GetxController {
   final pages = [
     HomeView(),
     WriteRecipeView(),
-    FavoritesView(),
+    FavoritView(),
     InspirationView(),
     ProfileView(),
   ];

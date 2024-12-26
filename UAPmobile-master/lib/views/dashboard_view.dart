@@ -15,7 +15,7 @@ class DashboardView extends StatelessWidget {
     return Obx(
           () => Scaffold(
         appBar: AppBar(
-          title: Text('Dashboard'),
+          title: Text('Masak Apa Hari ini Bro ?'),
           leading: IconButton(
             icon: CircleAvatar(
               backgroundImage: AssetImage(controller.profileImage.value),
@@ -25,15 +25,23 @@ class DashboardView extends StatelessWidget {
             },
           ),
         ),
-        body: IndexedStack(
-          index: controller.selectedIndex.value,
-          children: [
-            HomeView(),
-            WriteRecipeView(),
-            FavoritesView(),
-            InspirationView(),
-            ProfileView(),
-          ],
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/dashboard_back.png'), // Gambar background dari assets
+              fit: BoxFit.cover, // Menyesuaikan gambar untuk mengisi seluruh area
+            ),
+          ),
+          child: IndexedStack(
+            index: controller.selectedIndex.value,
+            children: [
+              HomeView(),
+              WriteRecipeView(),
+              FavoritView(),
+              InspirationView(),
+              ProfileView(),
+            ],
+          ),
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: controller.selectedIndex.value,

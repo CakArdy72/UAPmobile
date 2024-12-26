@@ -12,14 +12,15 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home', style: TextStyle(fontWeight: FontWeight.bold)),
+        // Menghapus title agar tidak ada teks 'Home'
         centerTitle: true,
         backgroundColor: Colors.white,
+        automaticallyImplyLeading: false, // Menghilangkan panah kiri atas (back button)
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.fromLTRB(8.0, 20.0, 8.0, 8.0), // Mengubah padding untuk search bar
             child: TextField(
               controller: searchController,
               onChanged: (query) {
@@ -61,60 +62,79 @@ class HomeView extends StatelessWidget {
               if (controller.isLoading.value) {
                 return Center(child: CircularProgressIndicator());
               }
-              return ListView(
-                padding: EdgeInsets.all(8),
-                children: [
-                  Text(
-                    'Makanan',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 20),
-                  ...controller.filteredMeals.map((meal) => Card(
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.all(10),
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.network(
-                          meal.strMealThumb,
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
+              return Expanded(
+                child: PageView.builder(
+                  itemCount: controller.filteredMeals.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    final meal = controller.filteredMeals[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Card(
+                        margin: EdgeInsets.symmetric(vertical: 8),
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(15)),
+                              child: Image.network(
+                                meal.strMealThumb,
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    meal.strMeal,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    meal.strArea ?? 'Unknown Area',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Spacer(),
+                            ElevatedButton(
+                              onPressed: () {
+                                Get.to(
+                                  MealDetailView(meal: meal),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text('Detail Resep'),
+                            ),
+                            SizedBox(height: 10),
+                          ],
                         ),
                       ),
-                      title: Text(
-                        meal.strMeal,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      subtitle: Text(
-                        meal.strArea ?? 'Unknown Area',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () {
-                        Get.to(
-                          MealDetailView(meal: meal),
-                        );
-                      },
-                    ),
-                  )),
-                ],
+                    );
+                  },
+                ),
               );
             }),
           ),

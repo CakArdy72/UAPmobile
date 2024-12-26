@@ -5,76 +5,82 @@ import 'package:http/http.dart' as http; // Import HTTP package
 import 'dart:convert'; // For decoding JSON
 
 class HomeController extends GetxController {
-  var isLoading = true.obs;
+  var isLoading = true.obs; // Status untuk loading indicator
   var foodMeals = <Meal>[].obs; // Daftar makanan asli dari API
-  var filteredMeals = <Meal>[].obs; // Daftar makanan setelah difilter berdasarkan pencarian
-  var mealDetail = Rx<Meal?>(null); // Untuk menampilkan detail makanan
+  var filteredMeals = <Meal>[].obs; // Daftar makanan yang telah difilter
+  var mealDetail = Rx<Meal?>(null); // Detail makanan berdasarkan idMeal
 
   @override
   void onInit() {
     super.onInit();
-    fetchMeals(); // Call fetchMeals() when the controller is initialized
+    fetchMeals(); // Panggil fetchMeals() saat controller diinisialisasi
   }
 
-  // Fetch meals data from an actual API
+  /// Fetch all meals data from API
   void fetchMeals() async {
     try {
-      isLoading.value = true; // Show loading indicator
-      var mealsData = await fetchMealsFromApi(); // Fetch data from API
-      foodMeals.value = mealsData.map((mealJson) => Meal.fromJson(mealJson)).toList(); // Convert JSON to Meal objects
-      filteredMeals.value = foodMeals; // Set filteredMeals to show all initially
+      isLoading.value = true; // Tampilkan loading
+      var mealsData = await fetchMealsFromApi(); // Ambil data dari API
+      foodMeals.value = mealsData
+          .map((mealJson) => Meal.fromJson(mealJson))
+          .toList(); // Konversi JSON ke objek Meal
+      filteredMeals.value = foodMeals; // Tampilkan semua data awalnya
     } catch (e) {
       print('Error fetching meals: $e');
+      Get.snackbar('Error', 'Gagal memuat data makanan.');
     } finally {
-      isLoading.value = false; // Hide loading indicator after data is fetched
+      isLoading.value = false; // Sembunyikan loading
     }
   }
 
-  // Actual API call to fetch meals data
+  /// API call to fetch meals
   Future<List<Map<String, dynamic>>> fetchMealsFromApi() async {
-    const url = 'https://www.themealdb.com/api/json/v1/1/filter.php?c=Beef'; // Example URL, can be adjusted based on your API
-    final response = await http.get(Uri.parse(url)); // Make GET request to API
+    const url =
+        'https://www.themealdb.com/api/json/v1/1/filter.php?c=Beef'; // URL API
+    final response = await http.get(Uri.parse(url)); // Permintaan GET ke API
 
     if (response.statusCode == 200) {
-      var data = json.decode(response.body); // Decode the response body
-      return List<Map<String, dynamic>>.from(data['meals']); // Return the list of meals from the API response
+      var data = json.decode(response.body); // Decode respons JSON
+      return List<Map<String, dynamic>>.from(data['meals'] ?? []); // Ambil daftar makanan
     } else {
-      throw Exception('Failed to load meals');
+      throw Exception('Failed to load meals'); // Jika gagal
     }
   }
 
-  // Fungsi untuk mencari makanan berdasarkan query
+  /// Filter meals based on search query
   void searchMeals(String query) {
     if (query.isEmpty) {
-      filteredMeals.value = foodMeals; // Jika query kosong, tampilkan semua makanan
+      filteredMeals.value = foodMeals; // Tampilkan semua makanan jika query kosong
     } else {
       filteredMeals.value = foodMeals.where((meal) {
-        return meal.strMeal.toLowerCase().contains(query.toLowerCase()) ||
-            meal.strCategory.toLowerCase().contains(query.toLowerCase());
-      }).toList(); // Filter berdasarkan nama atau kategori
+        return (meal.strMeal?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
+            (meal.strCategory?.toLowerCase().contains(query.toLowerCase()) ?? false);
+      }).toList();
     }
   }
 
-  // Fungsi untuk mengambil detail resep makanan berdasarkan idMeal
+  /// Fetch meal details by id
   Future<void> fetchMealDetail(String idMeal) async {
     try {
       var mealData = await fetchMealDetailFromApi(idMeal);
-      mealDetail.value = Meal.fromJson(mealData); // Set the detail of the meal
+      mealDetail.value = Meal.fromJson(mealData); // Tetapkan detail makanan
     } catch (e) {
       print('Error fetching meal details: $e');
+      Get.snackbar('Error', 'Gagal memuat detail makanan.');
     }
   }
 
-  // Memanggil API untuk mendapatkan detail makanan
+  /// API call to fetch meal details
   Future<Map<String, dynamic>> fetchMealDetailFromApi(String idMeal) async {
-    final url = 'https://www.themealdb.com/api/json/v1/1/lookup.php?i=$idMeal'; // API URL to fetch meal details
-    final response = await http.get(Uri.parse(url)); // Make GET request to fetch details
+    final url =
+        'https://www.themealdb.com/api/json/v1/1/lookup.php?i=$idMeal'; // URL API untuk detail makanan
+    final response = await http.get(Uri.parse(url)); // Permintaan GET
 
     if (response.statusCode == 200) {
-      var data = json.decode(response.body); // Decode the response body
-      return data['meals'][0]; // Return the first meal's details
+      var data = json.decode(response.body); // Decode respons JSON
+      return (data['meals']?.first ?? {}); // Ambil data makanan pertama
     } else {
-      throw Exception('Failed to load meal details');
+      throw Exception('Failed to load meal details'); // Jika gagal
     }
   }
 }

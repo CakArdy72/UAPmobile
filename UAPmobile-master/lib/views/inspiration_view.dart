@@ -13,6 +13,7 @@ class InspirationView extends StatelessWidget {
       appBar: AppBar(
         title: Text('Inspiration'),
         centerTitle: true,
+        automaticallyImplyLeading: false, // Menghilangkan panah kiri atas (back button)
       ),
       body: Column(
         children: [

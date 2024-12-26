@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "605279372289",
+    "project_id": "apkmasak-93233",
+    "storage_bucket": "apkmasak-93233.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:605279372289:android:c98efa30d8573cb1d52c00",
+        "android_client_info": {
+          "package_name": "com.example.apkmasak"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGuLbHW_EjzFOAR8Pcmv_ICqHbGidZLuc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
